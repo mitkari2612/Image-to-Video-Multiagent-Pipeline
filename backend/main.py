@@ -123,6 +123,51 @@ async def upload_images(files: List[UploadFile] = File(...)):
     }
 
 
+@app.get("/image")
+async def get_image(path: str):
+    """Serve image files."""
+    try:
+        # Decode the path
+        image_path = path
+        
+        # Check if file exists
+        if not os.path.exists(image_path):
+            raise HTTPException(status_code=404, detail="Image not found")
+        
+        # Determine content type
+        ext = os.path.splitext(image_path)[1].lower()
+        content_types = {
+            '.jpg': 'image/jpeg',
+            '.jpeg': 'image/jpeg',
+            '.png': 'image/png',
+            '.webp': 'image/webp',
+            '.gif': 'image/gif'
+        }
+        content_type = content_types.get(ext, 'image/jpeg')
+        
+        from fastapi.responses import FileResponse
+        return FileResponse(image_path, media_type=content_type)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=f"Image not found: {str(e)}")
+
+
+@app.get("/video")
+async def get_video(path: str):
+    """Serve video files."""
+    try:
+        # Decode the path
+        video_path = path
+        
+        # Check if file exists
+        if not os.path.exists(video_path):
+            raise HTTPException(status_code=404, detail="Video not found")
+        
+        from fastapi.responses import FileResponse
+        return FileResponse(video_path, media_type="video/mp4")
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=f"Video not found: {str(e)}")
+
+
 @app.get("/storyboard/{video_id}")
 async def get_storyboard(video_id: str):
     """Get storyboard for a generated video."""
